@@ -1,54 +1,36 @@
 <?php
-class mahasiswa_model{
+class mahasiswa_model {
+    private $table = 'mahasiswa';
+    private $db;
 
-    private $dbh; // database handler
-    private $stmt;
-
-    public function __construct()
-
-    {
-        //data source name
-        $dsn = 'mysql:host=localhost;dbname=phpmvc';
-
-        try {
-            $this->dbh = new PDO($dsn, 'root', '');
-        } catch(PDOException $e) {
-            die($e->getMessage());
-        }
+    public function __construct() {
+        $this->db = new Database;
+    }
+    
+    public function getAllMahasiswa() {
+        $this->db->query('SELECT * FROM ' . $this->table);
+        return $this->db->resultset();
     }
 
+    public function getMahasiswaById($id) {
+        $this->db->query('SELECT * FROM ' . $this->table . ' WHERE id = :id');
+        $this->db->bind('id', $id);
+        return $this->db->single();
+    }
 
-    //cara lain menampilkan data mahasiswa
-    //private $mhs = [
-      //  [
-        //    "nama" => "adistyo ariansa",
-          //  "nrp" => "181011400510",
-            //"email" => "adistyoariansa2@gmail.com",
-            //"jurusan" => "teknik informatika"
-        //],
-
-        //[
-          //  "nama" => "reza aji saputra",
-            //"nrp" => "181011400511",
-            //"email" => "reza@gmail.com",
-            //"jurusan" => "teknik informatika"
-        //],
-
-        //[
-          //  "nama" => "mario andika",
-            //"nrp" => "181011400512",
-            //"email" => "mario@gmail.com",
-            //"jurusan" => "teknik informatika"
-        //]
-        //];
+    public function tambahDataMahasiswa($data) {
+        $query = "INSERT INTO mahasiswa (nama, nrp, email, jurusan)
+                  VALUES (:nama, :nrp, :email, :jurusan)";
         
-        public function getAllMahasiswa()
-        {
-            $this->stmt = $this->dbh->prepare('SELECT * FROM mahasiswa');
-            $this->stmt->execute();
-            return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
+        $this->db->query($query);
+        $this->db->bind('nama', $data['nama']);
+        $this->db->bind('nrp', $data['nrp']);  // Tambahkan binding untuk 'nrp'
+        $this->db->bind('email', $data['email']);
+        $this->db->bind('jurusan', $data['jurusan']);
+        
+        $this->db->execute();  // Perbaiki ke 'execute'
+
+        return $this->db->rowCount();
+    }
 }
-
-
 ?>
